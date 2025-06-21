@@ -1,0 +1,38 @@
+# ProactiveChunkLoader Configuration
+# Enhanced version with advanced chunk loading and adaptive performance
+
+# Maximum chunks to load per task execution
+max-chunks-per-tick: 1
+
+# How many chunks beyond view distance to preload
+frontier-distance:
+  min: 1  # Start preloading from (view-distance + min) chunks away
+  max: 3  # Preload up to (view-distance + max) chunks away
+
+# Width of the preloading "cone" in each direction (1 = 3x3, 2 = 5x5)
+frontier-width: 1
+
+# Debug mode (enable for verbose logging)
+debug: false
+
+# Performance settings
+performance:
+  # Adjust chunk loading based on server TPS
+  adaptive-tps-scaling: true
+  
+  # Minimum TPS threshold before reducing chunk loading rate
+  minimum-tps: 18.0
+
+# Advanced features
+advanced:
+  # Enable adaptive cone prediction based on player movement
+  adaptive-cone-prediction: true
+  
+  # Number of movement records to keep per player for prediction
+  player-history-size: 10
+  
+  # How much player speed influences chunk loading priority (higher = more influence)
+  speed-influence-factor: 1.0
+  
+  # Enable extra detailed logging (performance impact)
+  extra-detailed-logging: false
