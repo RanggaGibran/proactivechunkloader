@@ -21,11 +21,14 @@ import java.util.stream.Collectors;
 public class PCLCommand implements CommandExecutor, TabCompleter {
 
     private final JavaPlugin plugin;
-    private final ChunkLoadManager chunkLoadManager;    public PCLCommand(JavaPlugin plugin, ChunkLoadManager chunkLoadManager) {
+    private final ChunkLoadManager chunkLoadManager;
+    
+    public PCLCommand(JavaPlugin plugin, ChunkLoadManager chunkLoadManager) {
         this.plugin = plugin;
         this.chunkLoadManager = chunkLoadManager;
     }
-      @Override
+    
+    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
             showHelp(sender);
@@ -97,9 +100,10 @@ public class PCLCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(
                 Component.text("/pcl reload").color(NamedTextColor.GREEN)
                     .append(Component.text(" - Reload the plugin configuration").color(NamedTextColor.WHITE))
-            );
-        }
-    }    @Override
+            );        }
+    }
+    
+    @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
         
@@ -153,13 +157,18 @@ public class PCLCommand implements CommandExecutor, TabCompleter {
             Component.text("Average load time: ").color(NamedTextColor.GREEN)
                 .append(Component.text(String.format("%.2f ms", stats.get("averageLoadTimeMs"))).color(NamedTextColor.WHITE))
         );
-        
-        // Display TPS with color indication
+          // Display TPS with color indication
         double tps = (Double) stats.get("currentTps");
         NamedTextColor tpsColor = NamedTextColor.GREEN;
-        if (tps < 18) tpsColor = NamedTextColor.YELLOW;
-        if (tps < 16) tpsColor = NamedTextColor.GOLD;
-        if (tps < 12) tpsColor = NamedTextColor.RED;
+        if (tps < 18) {
+            tpsColor = NamedTextColor.YELLOW;
+        }
+        if (tps < 16) {
+            tpsColor = NamedTextColor.GOLD;
+        }
+        if (tps < 12) {
+            tpsColor = NamedTextColor.RED;
+        }
         
         sender.sendMessage(
             Component.text("Current TPS: ").color(NamedTextColor.GREEN)

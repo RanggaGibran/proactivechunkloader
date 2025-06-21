@@ -2,6 +2,7 @@ package id.rnggagib;
 
 import id.rnggagib.commands.PCLCommand;
 import id.rnggagib.listeners.PlayerMoveListener;
+import id.rnggagib.listeners.PlayerQuitListener;
 import id.rnggagib.logic.ChunkLoadManager;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,18 +14,16 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class Plugin extends JavaPlugin {
     private ChunkLoadManager chunkLoadManager;
-    
-    @Override
+      @Override
     public void onEnable() {
         // Save default configuration
         saveDefaultConfig();
         
-        
         // Initialize chunk load manager
         chunkLoadManager = new ChunkLoadManager(this);
-        
-        // Register event listeners
+          // Register event listeners
         getServer().getPluginManager().registerEvents(new PlayerMoveListener(chunkLoadManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerQuitListener(chunkLoadManager), this);
         
         // Register commands
         PCLCommand pclCommand = new PCLCommand(this, chunkLoadManager);

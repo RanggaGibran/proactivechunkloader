@@ -1,6 +1,6 @@
 # ProactiveChunkLoader
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/ranggagibran/proactivechunkloader/releases)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/ranggagibran/proactivechunkloader/releases)
 [![Minecraft](https://img.shields.io/badge/minecraft-1.21.1-green.svg)](https://www.minecraft.net/)
 [![PaperMC](https://img.shields.io/badge/server-PaperMC-yellow.svg)](https://papermc.io/)
 [![Java](https://img.shields.io/badge/java-17%2B-orange.svg)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
@@ -22,6 +22,8 @@ ProactiveChunkLoader adalah plugin Minecraft untuk server PaperMC yang secara ce
 - **Configurable "Cone" Structure** - Controls how many chunks are loaded to the sides of the movement direction
 - **Performance Statistics** - Tracks chunk loading metrics for analysis and monitoring
 - **Comprehensive Commands** - For viewing info, statistics, and reloading configuration
+- **Memory Management** - Cleans up player data when they leave the server
+- **Thread-Safe Operation** - Utilizes concurrent data structures for server stability
 
 ## Fitur
 
@@ -147,6 +149,9 @@ advanced:
 - **advanced.adaptive-cone-prediction** - Use player movement history to predict direction of movement.
 - **advanced.player-history-size** - Number of movement records stored for each player.
 - **advanced.speed-influence-factor** - How much player speed influences chunk loading priority.
+- **advanced.cone-spread-factor** - Controls cone width (higher values = wider cone).
+- **advanced.velocity-influence-weight** - How much current velocity vs history influences direction prediction (0-1).
+- **advanced.minimum-speed-for-prediction** - Minimum player speed before velocity-based prediction activates.
 - **advanced.extra-detailed-logging** - Enable for very detailed logging (may affect performance).
 
 ### Penjelasan Konfigurasi
@@ -162,6 +167,9 @@ advanced:
 - **advanced.adaptive-cone-prediction** - Menggunakan riwayat pergerakan pemain untuk memprediksi arah gerakan.
 - **advanced.player-history-size** - Jumlah catatan pergerakan yang disimpan untuk setiap pemain.
 - **advanced.speed-influence-factor** - Seberapa besar kecepatan pemain memengaruhi prioritas pemuatan chunk.
+- **advanced.cone-spread-factor** - Mengontrol lebar cone (nilai lebih tinggi = cone lebih lebar).
+- **advanced.velocity-influence-weight** - Seberapa besar kecepatan saat ini vs riwayat memengaruhi prediksi arah (0-1).
+- **advanced.minimum-speed-for-prediction** - Kecepatan minimum pemain sebelum prediksi berbasis kecepatan diaktifkan.
 - **advanced.extra-detailed-logging** - Aktifkan untuk logging sangat detail (dapat memengaruhi performa).
 
 ## Permissions

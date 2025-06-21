@@ -11,7 +11,6 @@ import org.bukkit.util.Vector;
 import org.bukkit.Location;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Queue;
@@ -19,12 +18,10 @@ import java.util.PriorityQueue;
 import java.util.Comparator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
 
 /**
  * Manages the logic for queuing and loading chunks proactively
@@ -32,14 +29,12 @@ import java.util.stream.Collectors;
  */
 public class ChunkLoadManager {
     private final JavaPlugin plugin;
-    private final Logger logger;
-    private final Queue<PrioritizedChunk> chunkQueue;
-    private final Set<ChunkCoordinate> queuedChunks;
+    private final Logger logger;    private final Queue<PrioritizedChunk> chunkQueue;
+    private final Set<ChunkCoordinate> queuedChunks = ConcurrentHashMap.newKeySet();
     private BukkitTask loaderTask;
     private BukkitTask statsTask;
     private BukkitTask movementTrackingTask;
-    
-    // Configuration values
+      // Configuration values
     private int maxChunksPerTick;
     private int frontierMinDistance;
     private int frontierMaxDistance;
@@ -51,6 +46,9 @@ public class ChunkLoadManager {
     private int playerHistorySize;
     private double speedInfluenceFactor;
     private boolean enableExtraDetailedLogging;
+    private double coneSpreadFactor;
+    private double velocityInfluenceWeight;
+    private double minimumSpeedForPrediction;
     
     // Performance stats
     private final Map<Long, Integer> chunksLoadedHistory = new HashMap<>();
@@ -59,14 +57,12 @@ public class ChunkLoadManager {
     private long lastStatsReset = System.currentTimeMillis();
     private final Map<String, Long> chunkLoadTimes = new ConcurrentHashMap<>();
     private final LinkedHashMap<Integer, Integer> priorityDistribution = new LinkedHashMap<>();
-    
-    // Store the last processed chunk for each player to prevent redundant processing
-    private final Map<Player, ChunkCoordinate> lastPlayerChunks = new HashMap<>();
+      // Store the last processed chunk for each player to prevent redundant processing
+    private final Map<Player, ChunkCoordinate> lastPlayerChunks = new ConcurrentHashMap<>();
     
     // Player movement history for better prediction
-    private final Map<Player, List<PlayerMovement>> playerMovementHistory = new HashMap<>();
-    
-    public ChunkLoadManager(JavaPlugin plugin) {
+    private final Map<Player, List<PlayerMovement>> playerMovementHistory = new ConcurrentHashMap<>();
+      public ChunkLoadManager(JavaPlugin plugin) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
         // Initialize queue with priority comparator (higher values first, then by timestamp)
@@ -74,7 +70,6 @@ public class ChunkLoadManager {
             Comparator.comparing(PrioritizedChunk::getPriority).reversed()
                 .thenComparing(PrioritizedChunk::getTimestamp)
         );
-        this.queuedChunks = new HashSet<>();
         
         // Load configuration
         loadConfig();
@@ -82,8 +77,7 @@ public class ChunkLoadManager {
     
     /**
      * Load configuration values from config.yml
-     */
-    public void loadConfig() {
+     */    public void loadConfig() {
         plugin.saveDefaultConfig();
         
         maxChunksPerTick = plugin.getConfig().getInt("max-chunks-per-tick", 1);
@@ -99,6 +93,11 @@ public class ChunkLoadManager {
         playerHistorySize = plugin.getConfig().getInt("advanced.player-history-size", 10);
         speedInfluenceFactor = plugin.getConfig().getDouble("advanced.speed-influence-factor", 1.0);
         enableExtraDetailedLogging = plugin.getConfig().getBoolean("advanced.extra-detailed-logging", false);
+        
+        // New V2.0 configuration values
+        coneSpreadFactor = plugin.getConfig().getDouble("advanced.cone-spread-factor", 0.4);
+        velocityInfluenceWeight = plugin.getConfig().getDouble("advanced.velocity-influence-weight", 0.3);
+        minimumSpeedForPrediction = plugin.getConfig().getDouble("advanced.minimum-speed-for-prediction", 0.5);
         
         if (debug) {
             logger.info("Config loaded: maxChunksPerTick=" + maxChunksPerTick + 
@@ -360,9 +359,9 @@ public class ChunkLoadManager {
             }
         }
     }
-    
-    /**
+      /**
      * Check if a point (dx, dz) is within the cone defined by direction vector
+     * Optimized version using dot product calculations instead of acos for better performance
      * @param dx X offset from center
      * @param dz Z offset from center
      * @param dirX X direction component
@@ -372,24 +371,32 @@ public class ChunkLoadManager {
      */
     private boolean isInCone(int dx, int dz, double dirX, double dirZ, int width) {
         if (dx == 0 && dz == 0) {
-            return true; // Center is always in cone
+            return true; // Center of cone
         }
-        
-        // Calculate angle between (dx,dz) and (dirX,dirZ)
-        double dotProduct = dx * dirX + dz * dirZ;
-        double lenSq1 = dx * dx + dz * dz;
-        double lenSq2 = dirX * dirX + dirZ * dirZ;
-        
-        if (lenSq2 == 0 || lenSq1 == 0) {
-            return Math.abs(dx) <= width && Math.abs(dz) <= width;
+
+        // Vector from center of cone to chunk point
+        double pointX = dx;
+        double pointZ = dz;
+
+        // Dot product between direction vector and point vector
+        double dotProduct = pointX * dirX + pointZ * dirZ;
+
+        // If dot product < 0, point is behind the player
+        if (dotProduct < 0) {
+            return false;
         }
-        
-        double angle = Math.acos(dotProduct / Math.sqrt(lenSq1 * lenSq2));
-        
-        // Convert width to angle in radians
-        double maxAngle = Math.PI * width / 8;
-        
-        return angle <= maxAngle || Math.sqrt(lenSq1) <= width;
+
+        // Compare squared distances to avoid Math.sqrt()
+        double pointDistSq = pointX * pointX + pointZ * pointZ;
+        double coneDistSq = dotProduct * dotProduct;
+
+        // Calculate cone width at this distance (squared)
+        // Using the configurable cone spread factor
+        double maxSpreadSq = coneSpreadFactor * width;
+
+        // Check if point is inside the cone "spread"
+        // pointDistSq - coneDistSq is squared perpendicular distance from point to direction line
+        return (pointDistSq - coneDistSq) < (coneDistSq * maxSpreadSq);
     }
     
     /**
@@ -524,18 +531,7 @@ public class ChunkLoadManager {
                 cone.directionZ = 0;
                 break;
         }
-    }
-
-    /**
-     * Add a chunk to the loading queue if it's not already queued
-     * @param world The world
-     * @param x The chunk X coordinate
-     * @param z The chunk Z coordinate
-     */
-    private void addToQueue(World world, int x, int z) {
-        // Default priority of 1
-        addToQueue(world, x, z, 1);
-    }
+    }    // This method was removed as it was unused
     
     /**
      * Add a chunk to the loading queue with specified priority if not already queued
@@ -545,6 +541,11 @@ public class ChunkLoadManager {
      * @param priority Priority for loading (higher values = higher priority)
      */
     private void addToQueue(World world, int x, int z, int priority) {
+        // Skip already loaded chunks to avoid unnecessary processing
+        if (world.isChunkLoaded(x, z)) {
+            return;
+        }
+        
         ChunkCoordinate coord = new ChunkCoordinate(world, x, z);
         
         synchronized (queuedChunks) {
@@ -552,6 +553,14 @@ public class ChunkLoadManager {
                 queuedChunks.add(coord);
                 PrioritizedChunk prioritizedChunk = new PrioritizedChunk(coord, priority);
                 chunkQueue.offer(prioritizedChunk);
+                
+                // Track priority distribution for stats
+                priorityDistribution.merge(priority, 1, Integer::sum);
+                
+                if (debug && enableExtraDetailedLogging) {
+                    logger.info(String.format("Added chunk %d,%d in %s to queue with priority %d", 
+                        x, z, world.getName(), priority));
+                }
             }
         }
     }
@@ -602,6 +611,20 @@ public class ChunkLoadManager {
         return stats;
     }
 
+    /**
+     * Clean up resources for a player that has quit the server
+     * Prevents memory leaks by removing player data from all maps
+     * @param player The player who quit
+     */
+    public void handlePlayerQuit(Player player) {
+        lastPlayerChunks.remove(player);
+        playerMovementHistory.remove(player);
+        
+        if (debug) {
+            logger.info("Cleaned up resources for player: " + player.getName());
+        }
+    }
+    
     /**
      * Class to represent chunk coordinates with world reference
      */

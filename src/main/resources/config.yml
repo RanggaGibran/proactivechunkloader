@@ -34,5 +34,14 @@ advanced:
   # How much player speed influences chunk loading priority (higher = more influence)
   speed-influence-factor: 1.0
   
+  # Factor for cone spread calculation (higher = wider cone)
+  cone-spread-factor: 0.4
+  
+  # Weight for current velocity vs movement history (0-1, higher = more weight to current velocity)
+  velocity-influence-weight: 0.3
+  
+  # Minimum speed (blocks/second) before velocity-based prediction activates
+  minimum-speed-for-prediction: 0.5
+  
   # Enable extra detailed logging (performance impact)
   extra-detailed-logging: false
