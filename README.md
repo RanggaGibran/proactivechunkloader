@@ -1,8 +1,15 @@
 # ProactiveChunkLoader
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![Minecraft](https://img.shields.io/badge/minecraft-1.21.1-green.svg)
-![PaperMC](https://img.shields.io/badge/server-PaperMC-yellow.svg)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/ranggagibran/proactivechunkloader/releases)
+[![Minecraft](https://img.shields.io/badge/minecraft-1.21.1-green.svg)](https://www.minecraft.net/)
+[![PaperMC](https://img.shields.io/badge/server-PaperMC-yellow.svg)](https://papermc.io/)
+[![Java](https://img.shields.io/badge/java-17%2B-orange.svg)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
+
+**English** | [Bahasa Indonesia](#plugin-description-in-bahasa-indonesia)
+
+ProactiveChunkLoader is a Minecraft plugin for PaperMC servers that intelligently and proactively loads chunks around moving players, with the aim of reducing or eliminating lag spikes that occur when players enter unexplored areas of the world.
+
+## Plugin Description in Bahasa Indonesia
 
 ProactiveChunkLoader adalah plugin Minecraft untuk server PaperMC yang secara cerdas dan proaktif memuat (pre-generates) chunk di sekitar pemain yang sedang bergerak, dengan tujuan untuk mengurangi atau menghilangkan lag spike (penurunan TPS) yang terjadi ketika pemain memasuki area dunia yang belum pernah dijelajahi.
 
