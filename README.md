@@ -273,14 +273,12 @@ Kontribusi sangat diterima! Jika Anda ingin berkontribusi:
 If you experience issues or have questions:
 
 - Create an [Issue](https://github.com/ranggagibran/proactivechunkloader/issues) on GitHub
-- Post in the [SpigotMC discussion thread](https://www.spigotmc.org/threads/proactivechunkloader.xxxxx/)
 
 ## Support
 
 Jika Anda mengalami masalah atau memiliki pertanyaan:
 
 - Buat [Issue](https://github.com/ranggagibran/proactivechunkloader/issues) di GitHub
-- Posting di [thread diskusi SpigotMC](https://www.spigotmc.org/threads/proactivechunkloader.xxxxx/)
 
 ## License
 
