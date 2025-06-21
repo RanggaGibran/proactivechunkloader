@@ -13,6 +13,16 @@ ProactiveChunkLoader is a Minecraft plugin for PaperMC servers that intelligentl
 
 ProactiveChunkLoader adalah plugin Minecraft untuk server PaperMC yang secara cerdas dan proaktif memuat (pre-generates) chunk di sekitar pemain yang sedang bergerak, dengan tujuan untuk mengurangi atau menghilangkan lag spike (penurunan TPS) yang terjadi ketika pemain memasuki area dunia yang belum pernah dijelajahi.
 
+## Features
+
+- **Proactive Chunk Loading** - Loads chunks ahead of players based on their movement direction
+- **Smart Prioritization** - Prioritizes chunks that are most likely to be entered by players
+- **Adaptive Direction Prediction** - Predicts player movement direction based on history and velocity
+- **Intelligent Performance Adjustment** - Adjusts chunk loading rate based on server TPS
+- **Configurable "Cone" Structure** - Controls how many chunks are loaded to the sides of the movement direction
+- **Performance Statistics** - Tracks chunk loading metrics for analysis and monitoring
+- **Comprehensive Commands** - For viewing info, statistics, and reloading configuration
+
 ## Fitur
 
 - **Pemuat Chunk Proaktif** - Memuat chunk di depan pemain berdasarkan arah gerakan mereka
@@ -23,6 +33,15 @@ ProactiveChunkLoader adalah plugin Minecraft untuk server PaperMC yang secara ce
 - **Statistik Performa** - Melacak metrik pemuatan chunk untuk analisis dan pemantauan
 - **Perintah Lengkap** - Untuk melihat info, statistik, dan memuat ulang konfigurasi
 
+## Differences from Chunky Plugin
+
+Unlike mass chunk pre-generator plugins like Chunky, ProactiveChunkLoader:
+
+- Works in real-time as players move
+- Only loads chunks that are actually needed based on player movement direction
+- Uses fewer server resources because it's more selective
+- Prioritizes chunks based on the likelihood of players visiting them
+
 ## Perbedaan dengan Plugin Chunky
 
 Berbeda dengan plugin pre-generator chunk massal seperti Chunky, ProactiveChunkLoader:
@@ -32,13 +51,30 @@ Berbeda dengan plugin pre-generator chunk massal seperti Chunky, ProactiveChunkL
 - Menggunakan lebih sedikit resources server karena lebih selektif
 - Memprioritaskan chunk berdasarkan kemungkinan pemain akan mengunjunginya
 
+## Installation
+
+1. Download the latest `.jar` file from [Releases](https://github.com/ranggagibran/proactivechunkloader/releases) or [SpigotMC](https://www.spigotmc.org/resources/proactivechunkloader.xxxxx/)
+2. Place the `.jar` file in your server's `plugins` folder
+3. Restart the server or reload plugins with `/reload confirm`
+4. Adjust the configuration in `plugins/ProactiveChunkLoader/config.yml` if needed
+5. Use the `/pcl` command to ensure the plugin is working properly
+
 ## Instalasi
 
-1. Unduh file `.jar` terbaru dari [Releases](https://github.com/yourusername/ProactiveChunkLoader/releases) atau [SpigotMC](https://www.spigotmc.org/resources/proactivechunkloader.12345/)
+1. Unduh file `.jar` terbaru dari [Releases](https://github.com/ranggagibran/proactivechunkloader/releases) atau [SpigotMC](https://www.spigotmc.org/resources/proactivechunkloader.xxxxx/)
 2. Letakkan file `.jar` di folder `plugins` server Anda
 3. Mulai ulang server atau muat ulang plugin dengan `/reload confirm`
 4. Sesuaikan konfigurasi di `plugins/ProactiveChunkLoader/config.yml` jika diperlukan
 5. Gunakan perintah `/pcl` untuk memastikan plugin berfungsi dengan benar
+
+## Commands
+
+| Command | Description | Permission |
+|---------|-------------|------------|
+| `/pcl help` | Display help | `proactivechunkloader.command` |
+| `/pcl info` | Display plugin information | `proactivechunkloader.command` |
+| `/pcl stats` | Display performance statistics | `proactivechunkloader.stats` |
+| `/pcl reload` | Reload configuration | `proactivechunkloader.admin` |
 
 ## Perintah
 
@@ -48,6 +84,10 @@ Berbeda dengan plugin pre-generator chunk massal seperti Chunky, ProactiveChunkL
 | `/pcl info` | Menampilkan informasi plugin | `proactivechunkloader.command` |
 | `/pcl stats` | Menampilkan statistik performa | `proactivechunkloader.stats` |
 | `/pcl reload` | Memuat ulang konfigurasi | `proactivechunkloader.admin` |
+
+## Configuration
+
+This plugin provides various configuration options that can be adjusted in `config.yml`:
 
 ## Konfigurasi
 
@@ -94,6 +134,21 @@ advanced:
   extra-detailed-logging: false
 ```
 
+### Configuration Explanation
+
+- **max-chunks-per-tick** - Maximum number of chunks to load per tick. Higher values = faster loading but can impact performance.
+- **frontier-distance**
+  - **min** - Minimum distance outside the player's view-distance to start loading chunks
+  - **max** - Maximum distance outside the player's view-distance to load chunks
+- **frontier-width** - Width of the loading "cone". The higher the value, the wider the area loaded around the movement direction.
+- **debug** - Enable for more detailed logging.
+- **performance.adaptive-tps-scaling** - Automatically adjust chunk loading rate based on server TPS.
+- **performance.minimum-tps** - TPS threshold at which the plugin starts reducing chunk loading.
+- **advanced.adaptive-cone-prediction** - Use player movement history to predict direction of movement.
+- **advanced.player-history-size** - Number of movement records stored for each player.
+- **advanced.speed-influence-factor** - How much player speed influences chunk loading priority.
+- **advanced.extra-detailed-logging** - Enable for very detailed logging (may affect performance).
+
 ### Penjelasan Konfigurasi
 
 - **max-chunks-per-tick** - Jumlah maksimum chunk yang dimuat per tick. Nilai lebih tinggi = pemuatan lebih cepat tetapi bisa berdampak pada performa.
@@ -109,6 +164,14 @@ advanced:
 - **advanced.speed-influence-factor** - Seberapa besar kecepatan pemain memengaruhi prioritas pemuatan chunk.
 - **advanced.extra-detailed-logging** - Aktifkan untuk logging sangat detail (dapat memengaruhi performa).
 
+## Permissions
+
+| Permission | Description | Default |
+|------------|-------------|---------|
+| `proactivechunkloader.command` | Access to basic commands | `true` |
+| `proactivechunkloader.stats` | View performance statistics | `op` |
+| `proactivechunkloader.admin` | Administrative access (reload) | `op` |
+
 ## Izin
 
 | Izin | Deskripsi | Default |
@@ -116,6 +179,17 @@ advanced:
 | `proactivechunkloader.command` | Akses ke perintah dasar | `true` |
 | `proactivechunkloader.stats` | Melihat statistik performa | `op` |
 | `proactivechunkloader.admin` | Akses administratif (reload) | `op` |
+
+## Metrics and Statistics
+
+This plugin provides comprehensive metrics through the `/pcl stats` command:
+
+- Total chunks loaded
+- Number of chunks loaded in the last minute
+- Current queue size
+- Average loading time
+- Current server TPS
+- Current active loading settings
 
 ## Metrik dan Statistik
 
@@ -128,6 +202,14 @@ Plugin ini menyediakan metrik komprehensif melalui perintah `/pcl stats`:
 - TPS server saat ini
 - Pengaturan pemuatan aktif saat ini
 
+## Performance Tips
+
+1. Start with the default settings and adjust based on your needs.
+2. If your server experiences lag, reduce `max-chunks-per-tick` or increase `minimum-tps`.
+3. For servers with many players, the `adaptive-tps-scaling` feature helps balance chunk loading with server performance.
+4. The `adaptive-cone-prediction` feature is especially helpful for players moving quickly (such as when flying or using fast vehicles).
+5. Enable `debug` only when needed as it can flood the console with messages.
+
 ## Tips Performa
 
 1. Mulai dengan pengaturan default dan sesuaikan berdasarkan kebutuhan.
@@ -135,6 +217,21 @@ Plugin ini menyediakan metrik komprehensif melalui perintah `/pcl stats`:
 3. Untuk server dengan banyak pemain, fitur `adaptive-tps-scaling` sangat membantu menyeimbangkan pemuatan chunk dengan performa server.
 4. Fitur `adaptive-cone-prediction` sangat membantu untuk pemain yang bergerak cepat (seperti saat terbang atau menggunakan kendaraan cepat).
 5. Aktifkan `debug` hanya saat diperlukan karena dapat membanjiri konsol dengan pesan.
+
+## For Developers
+
+This plugin uses Maven as the build tool. To compile:
+
+```bash
+mvn clean package
+```
+
+The jar file will be generated in the `target` folder.
+
+## Dependencies
+
+- PaperMC API 1.21.1+
+- Java 17+
 
 ## Untuk Developer
 
@@ -151,6 +248,16 @@ File jar akan dihasilkan di folder `target`.
 - PaperMC API 1.21.1+
 - Java 17+
 
+## Contributing
+
+Contributions are welcome! If you'd like to contribute:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b new-feature`)
+3. Commit your changes (`git commit -am 'Add new feature'`)
+4. Push to the branch (`git push origin new-feature`)
+5. Create a new Pull Request
+
 ## Kontribusi
 
 Kontribusi sangat diterima! Jika Anda ingin berkontribusi:
@@ -163,10 +270,27 @@ Kontribusi sangat diterima! Jika Anda ingin berkontribusi:
 
 ## Support
 
+If you experience issues or have questions:
+
+- Create an [Issue](https://github.com/ranggagibran/proactivechunkloader/issues) on GitHub
+- Post in the [SpigotMC discussion thread](https://www.spigotmc.org/threads/proactivechunkloader.xxxxx/)
+
+## Support
+
 Jika Anda mengalami masalah atau memiliki pertanyaan:
 
-- Buat [Issue](https://github.com/yourusername/ProactiveChunkLoader/issues) di GitHub
-- Posting di [thread diskusi SpigotMC](https://www.spigotmc.org/threads/proactivechunkloader.12345/)
+- Buat [Issue](https://github.com/ranggagibran/proactivechunkloader/issues) di GitHub
+- Posting di [thread diskusi SpigotMC](https://www.spigotmc.org/threads/proactivechunkloader.xxxxx/)
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+## Author
+
+Created by [rnggagib](https://github.com/ranggagibran)
+
+---
 
 ## Lisensi
 
@@ -177,5 +301,3 @@ Proyek ini dilisensikan di bawah [MIT License](LICENSE).
 Dibuat oleh [rnggagib](https://github.com/ranggagibran)
 
 ---
-
-Jika Anda menganggap plugin ini berguna, pertimbangkan untuk [memberikan donasi](https://link-to-your-donation-page) atau memberikan rating di [SpigotMC](https://www.spigotmc.org/resources/proactivechunkloader.12345/).
